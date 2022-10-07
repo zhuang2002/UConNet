@@ -39,7 +39,6 @@ DerainNet.eval()
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', default=r'.\models/raft-sintel.pth',
                             help="restore checkpoint")
-    # parser.add_argument('--path', default=r'E:\zjh_code\derainNet\rain', help="dataset for evaluation")
 parser.add_argument('--small', action='store_true', help='use small model')
 parser.add_argument('--mixed_precision', action='store_true', help='use mixed precision')
 parser.add_argument('--alternate_corr', action='store_true', help='use efficent correlation implementation')
