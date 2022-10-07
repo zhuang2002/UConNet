@@ -59,16 +59,12 @@ def main():
         mean_loss = 0
         for i, data in enumerate(loader_train):
             # print(i)
-            R_img,M_img,B_img = data['rain_data'].type(torch.FloatTensor).cuda(),data['med_data'].type(torch.FloatTensor).cuda(),data['clean_data'].type(torch.FloatTensor).cuda()
+            R_img,M_img = data['rain_data'].type(torch.FloatTensor).cuda(),data['med_data'].type(torch.FloatTensor).cuda()
 
             image_Y,Cb,Cr = yCbCr2rgb(R_img)
-            clean_Y,Cb,Cr = yCbCr2rgb(B_img)
             M_y, Cb, Cr = yCbCr2rgb(M_img)
             image_Y = image_Y.unsqueeze(1)
-            clean_Y = clean_Y.unsqueeze(1)
             M_y = M_y.unsqueeze(1)
-            # print(image_Y)
-            # print(clean_Y)
             with torch.no_grad():
                 angle_predicted = AngleNet(R_img)
                 angle_predicted = (angle_predicted*120-60)/180*3.1415926535897
