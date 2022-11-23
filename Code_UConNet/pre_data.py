@@ -14,9 +14,9 @@ import argparse
 import sys
 sys.path.append('core')
 from raft import RAFT
-anglenet_address = r'.\result_model\AngleNet/AngleNet.pth'
-derainnet_adress =  r'.\result_model/UConNet/UconNet_2.pth'
-paramnet_adress = r'.\result_model\ParamNet\ParamNet_NTU.pth'
+anglenet_address = r'./result_model/AngleNet/AngleNet.pth'
+derainnet_adress =  r'./result_model/UConNet/UconNet_2.pth'
+paramnet_adress = r'./result_model/ParamNet/ParamNet_NTU.pth'
 AngleNet = Angle_Net(in_channels=3).cuda()
 AngleNet = nn.DataParallel(AngleNet).cuda()
 AngleNet.load_state_dict(torch.load(anglenet_address))
@@ -37,7 +37,7 @@ DerainNet = nn.DataParallel(DerainNet).cuda()
 DerainNet.load_state_dict(torch.load(derainnet_adress))
 DerainNet.eval()
 parser = argparse.ArgumentParser()
-parser.add_argument('--model', default=r'.\models/raft-sintel.pth',
+parser.add_argument('--model', default=r'./models/raft-sintel.pth',
                             help="restore checkpoint")
 parser.add_argument('--small', action='store_true', help='use small model')
 parser.add_argument('--mixed_precision', action='store_true', help='use mixed precision')
@@ -51,17 +51,24 @@ model.to('cuda')
 model.eval()
 idex_start = 0
 count = 2937#2144
-for name1 in [7]:
-    for name2 in [4]:
-        file_gt = r' '
-        file_rain = r''
-        file_out = r' '
+for name1 in range(7):
+    for name2 in range(4):
+        file_gt = r'./input/video/GT'
+        file_rain = r'./input/video/input'
+        file_out = r'./input/video/npy'
         gt_path = os.listdir(file_gt)
         # print(gt_path)
         Rain_path = os.listdir(file_rain)
         # print(Rain_path)
         gt_path = sorted(gt_path)
         Rain_path = sorted(Rain_path)
+
+        Rain_img_path = os.listdir(os.path.join(file_rain +'/'+ Rain_path[name2]))
+        gt_img_path = os.listdir(os.path.join(file_gt +'/'+ gt_path[name1]))
+
+        gt_img_path = sorted(gt_img_path)
+        Rain_img_path = sorted(Rain_img_path)
+
         len_file = 0
         if len(gt_path)>len(Rain_path):
             len_file = len(Rain_path)
@@ -75,12 +82,11 @@ for name1 in [7]:
 
                 with torch.no_grad():
                     idex = i+1
-
-                    last1 = cv2.imread(file_rain +'/'+ Rain_path[idex - 1])/255.0
-                    next1 = cv2.imread(file_rain +'/'+ Rain_path[idex + 1])/255.0
+                    last1 = cv2.imread(file_rain +'/'+ Rain_path[name2] +'/'+ Rain_img_path[idex - 1])/255.0
+                    next1 = cv2.imread(file_rain +'/'+ Rain_path[name2] +'/'+ Rain_img_path[idex + 1])/255.0
                     # next2 = cv2.imread(file_rain +'/'+ Rain_path[idex + 2])/255.0
-                    Rainy = cv2.imread(file_rain + '/' + Rain_path[idex])/255.0
-                    B_clean = cv2.imread(file_gt +'/'+ gt_path[idex])/255.0
+                    Rainy = cv2.imread(file_rain +'/'+ Rain_path[name2] +'/'+ Rain_img_path[idex])/255.0
+                    B_clean = cv2.imread(file_gt +'/'+ gt_path[name2] +'/'+ gt_img_path[idex])/255.0
                     last1 = torch.Tensor(last1).permute(2,0,1).unsqueeze(0).cuda()
                     # last2 = torch.Tensor(last2).permute(2, 0, 1).unsqueeze(0).cuda()
                     next1 = torch.Tensor(next1).permute(2, 0, 1).unsqueeze(0).cuda()
